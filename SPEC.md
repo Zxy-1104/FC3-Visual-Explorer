@@ -1,90 +1,52 @@
-# FC3 Visual Explorer SPEC
+# FC3 Visual Explorer Implementation Notes
 
-## Purpose
+## Project Goal
 
-Build and maintain a lightweight browser-based tool for introducing and visualizing third-order force constants (FC3) from ShengBTE/thirdorder workflows. The tool supports FC3 physical explanation, 3D three-body network inspection, and 1D/2D block-norm analysis for uncertainty-quantification studies of lattice thermal conductivity.
+FC3 Visual Explorer is a lightweight browser-based application for introducing, visualizing, and comparing third-order interatomic force constants (FC3) from ShengBTE/thirdorder-style workflows.
 
-## Default Inputs
+The project turns dense `FORCE_CONSTANTS_3RD` blocks into interactive geometry and compact analysis plots. It is intended to help users inspect FC3 block geometry, tensor-component distributions, block-norm distributions, and differences between multiple FC3 files.
 
-- `FORCE_CONSTANTS_3RD_0.45`: default third-order force-constant file.
-- `BASE.si_supper.scf.in`: default Quantum ESPRESSO Si supercell structure.
-- `app/data/fc3_045.json`: prebuilt default browser payload generated from the two files above.
+## Application Structure
 
-## User-Supplied Inputs
+The public web app is implemented as a static frontend in the `app/` directory:
 
-The browser UI should allow users to upload:
+- `app/index.html`: page layout, navigation tabs, upload controls, chart containers, object panels, and introduction content.
+- `app/styles.css`: visual layout, responsive behavior, panels, cards, controls, tables, and chart styling.
+- `app/app.js`: file parsing, FC3 data construction, 3D rendering, 2D plotting, compare logic, object-tree interaction, and UI state management.
+- `app/data/fc3_045.json`: embedded default example payload loaded when the page opens.
+- `app/assets/`: introduction images and other static visual assets.
 
-- A ShengBTE/thirdorder `FORCE_CONSTANTS_3RD` file.
-- Optionally, a Quantum ESPRESSO structure file containing `ATOMIC_POSITIONS crystal` and `CELL_PARAMETERS angstrom`.
+The app is deployed as static files. User-uploaded files are read by the browser through file inputs and parsed locally in JavaScript.
 
-If the user uploads only an FC3 file, the app may reuse the currently loaded structure. If the uploaded FC3 belongs to a different structure, the user should upload the matching structure file as well.
+## Default Example
 
-## Pages
+The page opens with an embedded example dataset:
 
-### FC3 Introduction
+- FC3 display name: `FORCE_CONSTANTS_3RD_Example`
+- Structure display name: `BASE.si_supper.scf.in_example`
+- Browser payload: `app/data/fc3_045.json`
 
-Summarize the project context from `AGENTS.md` in a web-readable form:
+The embedded JSON contains the prebuilt structure and FC3 block data needed for immediate 3D visualization and analysis without requiring the user to upload local files.
 
-- FC3 definition and physical meaning.
-- Finite-difference reconstruction logic.
-- `FORCE_CONSTANTS_3RD` block geometry and the meaning of `Rj/Rk`.
-- Relationship between FC3, three-phonon scattering, phonon lifetime, and thermal conductivity.
-- Clear warning that FC3 block norm is a consistency descriptor, not a direct predictor of `kappa`.
+## User Inputs
 
-### 3D Visualization
+The app supports user-supplied files through browser file inputs:
 
-Display a VESTA-like FC3 three-body network:
+- A ShengBTE/thirdorder-compatible `FORCE_CONSTANTS_3RD` file.
+- A matching Quantum ESPRESSO structure file containing lattice vectors and atomic positions.
 
-- Si atoms as shaded spheres.
-- Si bonds as neutral gray lines.
-- FC3 three-body interactions as triangle edges without filled faces.
-- Edge color and width mapped to block Frobenius norm.
-- Visible colorbar with colors distinct from atom bonds.
-- Custom lattice-index boundary.
-- Preset boundary buttons for common `1x1x1`, `2x2x2`, and `3x3x3` views.
-- View-direction presets: free, `[100]`, `[010]`, `[001]`, `[110]`, `[111]`.
-- Display toggles for atoms, bonds, FC3 network, and cell boundary.
-- Mouse drag rotation.
-- Mouse-wheel zoom and explicit zoom/reset controls.
-- Object tree: element -> atom label -> FC3 block list sorted by norm.
-- Clicking a block in the tree highlights the corresponding FC3 triangle.
+If only an FC3 file is uploaded, the app may reuse the currently loaded structure. For data from a different material, primitive cell, or supercell, the matching structure file should be uploaded as well.
 
-### FC3 Analysis
+## FC3 File Interpretation
 
-Provide publication-style FC3 block-norm analysis:
+Each `FORCE_CONSTANTS_3RD` block is interpreted as one three-body FC3 block with:
 
-- `FC3_component count distribution` using all 27 tensor components from every FC3 block. Check the positive/negative magnitude symmetry for the current dataset; plot only the positive-component distribution when the check passes, and retain zero counts in the note and table.
-- `FC3_block count distribution` using the Frobenius norm of each FC3 block.
-- `FC3_block vs perimeter`, where `FC3_block = ||Phi3_block||F` and `perimeter = |xj - xi| + |xk - xi| + |xj - xk|`. Plot perimeter on a linear axis and `FC3_block` on a log axis, retaining zero-perimeter blocks at `x = 0`.
-- `FC3_block vs max_edge_length`, where `max_edge_length` is the longest side of the FC3 three-body triangle.
-- Use `1e-4 eV/Å^3` as the default plotting threshold for component magnitudes and block norms. Values below the threshold are retained in notes/tables but omitted from log-scale plots.
-- Provide scrollable data tables for the component distribution and the block-norm/perimeter grouping.
-- White background, black axes, clear ticks, restrained color, high-resolution canvas rendering.
-- Log axes should use decade major ticks and `2..9 x 10^n` minor ticks with ordinary numeric tick labels; do not add an extra `log10 scale` text label.
+- `block_id`: write-order identifier.
+- `Rj`, `Rk`: periodic translation vectors for the second and third atoms.
+- `i`, `j`, `k`: primitive-cell atom labels.
+- 27 Cartesian tensor components.
 
-### FC3 Compare
-
-Compare multiple `FORCE_CONSTANTS_3RD` files with a shared structure. This page focuses on distribution comparison, not block-by-block parity, so files with different block counts are allowed.
-
-- Provide four FC3 compare slots. Each slot has a file input, load/unload controls, editable legend text, and an editable color. Slot 1 follows the current main dataset by default.
-- Provide one shared Compare structure input; if unset, reuse the current main structure.
-- Plot multi-file `FC3_component count distribution` curves using the same thresholded component-distribution mode as the 2D page. If every loaded file has paired positive/negative component magnitudes, show one positive-component comparison plot. If any loaded file is not paired, show separate positive and negative magnitude comparison plots.
-- Plot multi-file `FC3_block count distribution`, `FC3_block vs perimeter`, and `FC3_block vs max_edge_length` using the same thresholded modes as the Analysis page.
-- Use distinct colors and editable legends.
-- Report block counts and tensor-component counts for each loaded slot.
-- Use global axis ranges across all loaded FC3 files, not per-file ranges.
-
-## Derived Quantities
-
-For each FC3 block:
-
-- Frobenius norm:
-
-```text
-||Phi3_block||F = sqrt(sum_{alpha,beta,gamma} Phi_{alpha,beta,gamma}^2)
-```
-
-- Real-space vertices:
+The real-space triangle used for visualization is built from:
 
 ```text
 xi = ri
@@ -92,41 +54,136 @@ xj = rj + Rj
 xk = rk + Rk
 ```
 
-- Maximum pair distance:
+Here `ri`, `rj`, and `rk` are basis positions from the structure file. `Rj = 0` or `Rk = 0` means the corresponding atom is in the reference primitive-cell image; it does not mean the atom is at the coordinate origin.
+
+## Derived Quantities
+
+For each FC3 block, the app computes:
+
+- Frobenius norm:
 
 ```text
-dmax = max(|xj - xi|, |xk - xi|, |xj - xk|)
+FC3_block = ||Phi3_block||F
+          = sqrt(sum_{alpha,beta,gamma} Phi_{alpha,beta,gamma}^2)
+```
+
+- Triangle edge lengths:
+
+```text
+edge_ij = |xj - xi|
+edge_ik = |xk - xi|
+edge_jk = |xj - xk|
 ```
 
 - Triangle perimeter:
 
 ```text
-perimeter = |xj - xi| + |xk - xi| + |xj - xk|
+perimeter = edge_ij + edge_ik + edge_jk
 ```
 
-- Tensor-component distribution values:
+- Maximum edge length:
+
+```text
+max_edge_length = max(edge_ij, edge_ik, edge_jk)
+```
+
+- Tensor-component magnitudes:
 
 ```text
 abs(Phi3_component)
 ```
 
-Use only nonzero component values for log-scale histograms and report the zero count separately.
+Zero values and values below plotting thresholds are retained in counts and tables where applicable, but they are not drawn directly on logarithmic axes.
 
-## Acceptance Criteria
+## Introduction Page
 
-- The app opens with the default Si 0.45 nm dataset already visible.
-- Uploading a valid `FORCE_CONSTANTS_3RD` file rebuilds the 3D, 2D, and 1D views in the browser.
-- Uploading a QE structure file updates the structure used for geometry reconstruction.
-- Custom boundary controls update atoms, bonds, FC3 blocks, and cell boundary.
-- 3D view supports rotation, wheel zoom, zoom buttons, and reset view.
-- The FC3 object tree lists only atoms participating in FC3 blocks and sorts each atom's block list by norm.
-- Selecting an object-tree block highlights the corresponding triangle clearly.
-- 2D and 1D charts are crisp enough for screenshots and use a PRB-like visual style.
-- Controls do not overlap the visualization on desktop or narrow windows.
+The Introduction page provides a compact explanation of:
 
-## Prompt, AGENTS.md, And Skill Guidance
+- What FC3 represents physically.
+- How two-body and three-body force responses differ.
+- Why FC3 blocks can be represented as three-atom triangles.
+- What the web app does and which analysis modules it provides.
+- Which input files are required and how users should operate the app.
 
-- Put task-specific goals, files, UI features, and acceptance criteria in prompts or this `SPEC.md`.
-- Keep durable physics explanations, FC3 interpretation rules, and writing boundaries in `AGENTS.md`.
-- Create a skill only after the FC3 parsing and visualization workflow is reused enough to stabilize into a general method.
-- Use sub-agents only when tasks are independent, for example one worker for frontend interaction, one for parser validation, and one for documentation. This project is currently small enough to implement locally in one pass.
+The Concept Illustration section uses static images from `app/assets/` to show two-body and three-body force-response sketches.
+
+## 3D Visualization Page
+
+The 3D page renders a VESTA-like FC3 inspection view:
+
+- Atoms are drawn as shaded spheres.
+- Bonds are drawn as neutral lines based on element-pair distance criteria.
+- FC3 blocks are drawn as triangle edges without filled faces.
+- FC3 block norm controls triangle color and line width.
+- A colorbar indicates the norm-color mapping.
+- Lattice boundary inputs control the displayed image range.
+- View direction controls apply common crystallographic views.
+- Zoom controls and mouse wheel change camera distance.
+- Toggles control atoms, bonds, FC3 network, and cell boundary visibility.
+
+The FC3 object tree is organized by:
+
+```text
+Element -> atom label -> FC3 blocks sorted by norm
+```
+
+Users can expand or collapse tree levels, hide elements or atom labels, hide individual blocks, and highlight selected FC3 blocks. Pick-atom mode identifies a concrete visible atom instance and emphasizes FC3 blocks involving that atom within the current norm range.
+
+## FC3 Analysis Page
+
+The Analysis page provides four plots:
+
+1. `FC3_component count distribution`
+2. `FC3_block count distribution`
+3. `FC3_block vs perimeter`
+4. `FC3_block vs max_edge_length`
+
+The component plot uses the 27 Cartesian tensor components from each FC3 block. The app checks whether positive and negative component magnitudes are paired for the current dataset. If they are paired, only the positive-component distribution is plotted; otherwise, positive and negative magnitude distributions are plotted separately.
+
+The block distribution uses the Frobenius norm of each FC3 block. The perimeter and max-edge plots relate block strength to the three-body triangle geometry.
+
+The default plotting threshold is:
+
+```text
+1e-4 eV/Angstrom^3
+```
+
+Values below this threshold are omitted from log-scale plots but retained in notes and tables. Analysis plots use a white background, black axes, clear ticks, high-resolution canvas rendering, and ordinary numeric tick labels.
+
+## FC3 Compare Page
+
+The Compare page overlays distribution-level descriptors from multiple FC3 files. It does not require the compared files to have identical block counts.
+
+The compare workflow includes:
+
+- One shared structure input.
+- Up to four FC3 file slots.
+- Editable legend text for each slot.
+- Editable colors for each slot.
+- Load and unload controls for each slot.
+- Optional batch loading into the compare slots.
+
+The Compare page draws:
+
+1. `FC3_component count distribution`
+2. `FC3_block count distribution`
+3. `FC3_block vs perimeter`
+4. `FC3_block vs max_edge_length`
+
+All compare plots use global axis ranges across the loaded files so that distributions are visually comparable.
+
+## Static Deployment
+
+The deployed site serves the `app/` directory as static files. No backend service is required for normal use.
+
+The GitHub Pages workflow is stored in:
+
+```text
+.github/workflows/pages.yml
+```
+
+For Cloudflare Pages or another static host, the deployment output directory should be:
+
+```text
+app
+```
