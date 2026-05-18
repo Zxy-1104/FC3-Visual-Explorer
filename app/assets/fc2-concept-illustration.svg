@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-label="Two-body force response in a graphene honeycomb lattice">
+  <defs>
+    <style>
+      .bg{fill:#f7f9fc}.panel{fill:#fff;stroke:#d2d8e2;stroke-width:3}.bond{stroke:#8a94a3;stroke-width:4;stroke-linecap:round}.atom{fill:#1f2933;stroke:#fff;stroke-width:5}.source{fill:#0b63ce;stroke:#fff;stroke-width:5}.target{fill:#d62828;stroke:#fff;stroke-width:5}.disp{stroke:#0b63ce;stroke-width:11;stroke-linecap:round;marker-end:url(#arrowBlue)}.force{stroke:#d62828;stroke-width:13;stroke-linecap:round;marker-end:url(#arrowRed)}.title{font:700 34px Arial,sans-serif;fill:#111827}.note{font:24px Arial,sans-serif;fill:#374151}.small{font:21px Arial,sans-serif;fill:#4b5563}.tag{font:700 24px Arial,sans-serif;fill:#111827}
+    </style>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#0b63ce"/></marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#d62828"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="760"/>
+  <rect class="panel" x="60" y="56" width="1080" height="648" rx="18"/>
+  <text class="title" x="100" y="120">Two-body force response</text>
+  <text class="note" x="100" y="160">One atomic displacement produces a force response on another atom.</text>
+
+  <g transform="translate(220 235)">
+    <g class="bond">
+      <line x1="0" y1="120" x2="104" y2="60"/><line x1="104" y1="60" x2="208" y2="120"/><line x1="208" y1="120" x2="208" y2="240"/><line x1="208" y1="240" x2="104" y2="300"/><line x1="104" y1="300" x2="0" y2="240"/><line x1="0" y1="240" x2="0" y2="120"/>
+      <line x1="208" y1="120" x2="312" y2="60"/><line x1="312" y1="60" x2="416" y2="120"/><line x1="416" y1="120" x2="416" y2="240"/><line x1="416" y1="240" x2="312" y2="300"/><line x1="312" y1="300" x2="208" y2="240"/>
+      <line x1="416" y1="120" x2="520" y2="60"/><line x1="520" y1="60" x2="624" y2="120"/><line x1="624" y1="120" x2="624" y2="240"/><line x1="624" y1="240" x2="520" y2="300"/><line x1="520" y1="300" x2="416" y2="240"/>
+    </g>
+    <circle class="atom" cx="0" cy="120" r="27"/><circle class="atom" cx="104" cy="60" r="27"/><circle class="atom" cx="208" cy="120" r="27"/><circle class="target" cx="208" cy="240" r="30"/><circle class="atom" cx="104" cy="300" r="27"/><circle class="atom" cx="0" cy="240" r="27"/>
+    <circle class="source" cx="312" cy="36" r="31"/><circle class="atom" cx="416" cy="120" r="27"/><circle class="atom" cx="416" cy="240" r="27"/><circle class="atom" cx="312" cy="300" r="27"/>
+    <circle class="atom" cx="520" cy="60" r="27"/><circle class="atom" cx="624" cy="120" r="27"/><circle class="atom" cx="624" cy="240" r="27"/><circle class="atom" cx="520" cy="300" r="27"/>
+    <line class="disp" x1="312" y1="88" x2="312" y2="28"/>
+    <line class="force" x1="208" y1="240" x2="300" y2="214"/>
+    <text class="tag" x="270" y="12">u_j</text>
+    <text class="tag" x="318" y="210">F_i</text>
+  </g>
+
+  <text class="small" x="100" y="655">Schematic FC2-like response: the force on atom i changes when atom j is displaced.</text>
+</svg>

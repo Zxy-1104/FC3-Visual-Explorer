@@ -1,0 +1,361 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FC3 Visual Explorer</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">&Phi;3</span>
+        <div>
+          <h1>FC3 Visual Explorer</h1>
+          <p>Visual exploration of third-order force constants</p>
+        </div>
+      </div>
+      <nav class="tabs" aria-label="Primary">
+        <button class="tab is-active" data-tab="intro">Introduction</button>
+        <button class="tab" data-tab="view3d">3D Visualization</button>
+        <button class="tab" data-tab="view2d">FC3 Analysis</button>
+        <button class="tab" data-tab="compare">FC3 Compare</button>
+      </nav>
+    </header>
+
+    <main>
+      <section id="globalDataPanel" class="data-panel" aria-label="Data input">
+        <div>
+          <h2>Data Input</h2>
+          <p id="dataStatus">Default example loaded: FORCE_CONSTANTS_3RD_Example and BASE.si_supper.scf.in_example.</p>
+        </div>
+        <label>
+          FORCE_CONSTANTS_3RD
+          <input id="fc3FileInput" type="file" />
+          <span id="fc3FileDisplay" class="file-display">FORCE_CONSTANTS_3RD_Example</span>
+        </label>
+        <label>
+          QE structure
+          <input id="qeFileInput" type="file" />
+          <span id="qeFileDisplay" class="file-display">BASE.si_supper.scf.in_example</span>
+        </label>
+        <button id="loadUploadButton" class="command">Load Uploaded Data</button>
+        <button id="restoreDefaultButton" class="command secondary">Restore Default</button>
+      </section>
+
+      <section id="intro" class="panel is-active">
+        <div class="intro-shell">
+          <div class="intro-tabs" aria-label="Introduction sections">
+            <button class="intro-tab is-active" data-intro-tab="intro-overview">Overview</button>
+            <button class="intro-tab" data-intro-tab="intro-guide">Data And Operation</button>
+          </div>
+
+          <article id="intro-overview" class="intro-pane is-active">
+            <div class="intro-card-grid overview-grid">
+              <section class="intro-card prose">
+                <h2>FC3 Introduction</h2>
+                <p>
+                  Third-order force constants, usually shortened to FC3, quantify the leading anharmonic
+                  coupling beyond the harmonic force-constant picture. In a harmonic or FC2-like response,
+                  displacing one atomic degree of freedom changes the force on another degree of freedom in an
+                  approximately linear way. FC3 measures how that force response itself changes when a second
+                  displacement degree of freedom is introduced.
+                </p>
+                <div class="formula equation-stack">
+                  <span>&Phi;<sub>ijk</sub><sup>&alpha;&beta;&gamma;</sup> =</span>
+                  <span class="fraction">
+                    <span class="numerator">&part;<sup>3</sup>U</span>
+                    <span class="denominator">&part;u<sub>i</sub><sup>&alpha;</sup> &part;u<sub>j</sub><sup>&beta;</sup> &part;u<sub>k</sub><sup>&gamma;</sup></span>
+                  </span>
+                  <span>= -</span>
+                  <span class="fraction">
+                    <span class="numerator">&part;<sup>2</sup>F<sub>i</sub><sup>&alpha;</sup></span>
+                    <span class="denominator">&part;u<sub>j</sub><sup>&beta;</sup> &part;u<sub>k</sub><sup>&gamma;</sup></span>
+                  </span>
+                </div>
+                <p>
+                  The two concept illustrations use the same idea. The first panel sketches a two-body response:
+                  one atom is displaced and a force response appears on a neighboring atom. The second panel adds
+                  another small displacement in a graphene-like honeycomb network; the force response on the same
+                  atom is modified by the coupled pair of displacements. This mixed response is the physical
+                  content represented by an FC3 block.
+                </p>
+                <p>
+                  In ShengBTE-type workflows, FC3 enters three-phonon matrix elements and therefore affects
+                  phonon scattering rates, phonon lifetimes, and lattice thermal conductivity. The norm of an
+                  FC3 block is useful for visual inspection and consistency checking, but it should not be read
+                  as a standalone predictor of kappa.
+                </p>
+              </section>
+
+              <section class="intro-card prose">
+                <h2>Explorer Purpose</h2>
+                <p>
+                  FC3 Visual Explorer converts a dense third-order force-constant file into inspectable
+                  geometry and compact analysis figures. It is intended for researchers who need to examine
+                  interaction range, dominant and weak FC3 blocks, tensor-component distributions, and
+                  distribution-level differences between several force-constant datasets.
+                </p>
+                <p>
+                  The app links each FC3 block to a three-atom triangle, maps block Frobenius norm to color and
+                  line width, and provides plots that make cutoff, supercell, displacement, and dataset-comparison
+                  effects easier to inspect before the data are used in a thermal-transport calculation.
+                </p>
+              </section>
+
+              <section class="intro-card prose concept-panel">
+                <h2>Concept Illustration</h2>
+                <div class="concept-gallery">
+                  <figure class="concept-figure">
+                    <img src="./assets/fc2-force-response-graphene.png?v=20260518-user-image" alt="Two-body force response concept" />
+                    <figcaption>Two-body response: one displacement changes one force response.</figcaption>
+                  </figure>
+                  <figure class="concept-figure">
+                    <img src="./assets/fc3-anharmonic-response-graphene.png?v=20260518-user-image" alt="Three-body FC3 force response concept" />
+                    <figcaption>Three-body response: a second displacement changes the original force response.</figcaption>
+                  </figure>
+                </div>
+              </section>
+            </div>
+          </article>
+
+          <article id="intro-guide" class="intro-pane">
+            <div class="intro-card-grid guide-grid">
+              <section class="intro-card prose">
+                <h2>Required Data</h2>
+                <p>
+                  The main input is a FORCE_CONSTANTS_3RD file generated by thirdorder or a ShengBTE-compatible
+                  workflow. Each block should provide a block id, Rj and Rk periodic translations, primitive-cell
+                  atom labels i, j, k, and 27 Cartesian tensor components.
+                </p>
+                <p>
+                  A Quantum ESPRESSO pw.x structure file is required to reconstruct lattice vectors, species,
+                  and basis positions. The parser expects CELL_PARAMETERS and ATOMIC_POSITIONS crystal.
+                  Compatible primitive cells and regular repeated supercells are supported; for supercells, the
+                  app infers the primitive basis when possible.
+                </p>
+              </section>
+
+              <section class="intro-card prose wide-card">
+                <h2>Operation And Calculations</h2>
+                <p>
+                  Use <strong>Data Input</strong> on the analysis pages to load a new FC3 file and a matching QE
+                  structure. The embedded example opens automatically. The 3D page displays atoms, bonds,
+                  cell boundaries, and FC3 triangles. Boundary inputs choose the visible lattice-image range;
+                  Norm range filters FC3 blocks by Frobenius norm; View Direction and zoom controls adjust the
+                  camera; the Objects panel hides or highlights elements, atom labels, and individual blocks.
+                </p>
+                <p>
+                  <strong>Pick atom</strong> lets you click a visible atom instance and emphasize FC3 blocks that
+                  include that specific atom image. <strong>Isolate picked atom</strong> hides unrelated FC3
+                  network lines so the selected atom's three-body interactions can be inspected without visual
+                  clutter.
+                </p>
+                <p>
+                  For each block, the plotted triangle is built from
+                  xi = ri, xj = rj + Rj, and xk = rk + Rk. The scalar strength is the Frobenius norm over the
+                  27 Cartesian tensor components of that FC3 block:
+                </p>
+                <div class="formula equation-stack">
+                  <span>FC3_block = ||&Phi;<sub>block</sub>||<sub>F</sub> =</span>
+                  <span class="radical">
+                    <span class="radical-symbol">&radic;</span>
+                    <span class="radical-body">&Sigma;<sub>&alpha;&beta;&gamma;</sub> (&Phi;<sub>ijk</sub><sup>&alpha;&beta;&gamma;</sup>)<sup>2</sup></span>
+                  </span>
+                </div>
+                <p>
+                  The component distribution counts individual tensor values; the block distribution counts FC3
+                  block norms; the perimeter plot uses the sum of the three triangle edges; the max-edge plot
+                  uses the longest triangle edge. Compare overlays the same descriptors for up to four FC3 files
+                  against one structure and does not assume identical block counts.
+                </p>
+              </section>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="view3d" class="panel">
+        <div class="workspace">
+          <aside class="controls">
+            <h2>3D Controls</h2>
+            <div class="boundary-grid" aria-label="Lattice boundary">
+              <label>a min <input id="aMin" type="number" step="1" value="-1" /></label>
+              <label>a max <input id="aMax" type="number" step="1" value="1" /></label>
+              <label>b min <input id="bMin" type="number" step="1" value="-1" /></label>
+              <label>b max <input id="bMax" type="number" step="1" value="1" /></label>
+              <label>c min <input id="cMin" type="number" step="1" value="-1" /></label>
+              <label>c max <input id="cMax" type="number" step="1" value="1" /></label>
+            </div>
+            <label>View Direction
+              <select id="viewSelect">
+                <option value="free">Free rotation</option>
+                <option value="100">[100]</option>
+                <option value="010">[010]</option>
+                <option value="001">[001]</option>
+                <option value="110">[110]</option>
+                <option value="111">[111]</option>
+              </select>
+            </label>
+            <button id="applyViewButton" class="mini-command full-width">Apply View</button>
+            <div class="norm-range">
+              <div class="control-title">Norm range (eV/Å³)</div>
+              <div class="norm-input-grid">
+                <label>min <input id="normMinInput" type="number" min="0" step="0.001" /></label>
+                <label>max <input id="normMaxInput" type="number" min="0" step="0.001" /></label>
+              </div>
+              <label class="range-label">min slider
+                <input id="normMinSlider" type="range" min="0" max="1000" value="0" />
+              </label>
+              <label class="range-label">max slider
+                <input id="normMaxSlider" type="range" min="0" max="1000" value="1000" />
+              </label>
+              <p id="normRangeLabel" class="mini-note"></p>
+            </div>
+            <div class="zoom-row">
+              <button id="zoomOutButton" class="mini-command">Zoom -</button>
+              <button id="zoomInButton" class="mini-command">Zoom +</button>
+              <button id="resetViewButton" class="mini-command">Reset</button>
+            </div>
+            <div class="toggle-grid">
+              <label><input id="showAtoms" type="checkbox" checked /> Atoms</label>
+              <label><input id="showBonds" type="checkbox" checked /> Bonds</label>
+              <label><input id="showFc3" type="checkbox" checked /> FC3 network</label>
+              <label><input id="showCell" type="checkbox" checked /> Cell boundary</label>
+              <label><input id="pickAtomMode" type="checkbox" /> Pick atom</label>
+              <label><input id="isolatePickedAtom" type="checkbox" /> Isolate picked atom</label>
+            </div>
+            <button id="clearHighlightButton" class="command secondary full">Clear Highlight</button>
+            <div id="sceneStats" class="stats"></div>
+          </aside>
+          <div class="scene-wrap">
+            <canvas id="scene3d" width="1400" height="860"></canvas>
+            <div class="colorbar">
+              <span>high</span>
+              <div></div>
+              <span>low</span>
+            </div>
+          </div>
+          <aside class="object-panel">
+            <h2>FC3 Objects</h2>
+            <p class="object-hint">Element -> atom label -> FC3 blocks sorted by norm.</p>
+            <div id="objectTree" class="object-tree"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="view2d" class="panel">
+        <div class="chart-grid">
+          <figure>
+            <figcaption>FC3_component count distribution</figcaption>
+            <canvas id="histChart" width="1200" height="720"></canvas>
+            <p id="componentHistogramNote" class="chart-note"></p>
+            <div class="context-note">
+              In a centrosymmetric structure, inversion maps a third-order polar tensor component to a
+              symmetry-equivalent component with the opposite sign. When the FC3 file is fully expanded over
+              the symmetry-complete block set and the distance cutoff is applied through the same symmetry
+              workflow, this can produce paired positive and negative component magnitudes.
+            </div>
+            <div class="table-block">
+              <h3>FC3_component distribution table</h3>
+              <div class="table-scroll">
+                <table id="componentDistributionTable"></table>
+              </div>
+            </div>
+          </figure>
+          <figure>
+            <figcaption>FC3_block count distribution</figcaption>
+            <canvas id="blockDistChart" width="1200" height="720"></canvas>
+            <p id="blockDistributionNote" class="chart-note"></p>
+            <div class="table-block">
+              <h3>FC3_block distribution table</h3>
+              <div class="table-scroll">
+                <table id="blockDistributionTable"></table>
+              </div>
+            </div>
+          </figure>
+          <figure>
+            <figcaption>FC3_block vs perimeter</figcaption>
+            <canvas id="shellChart" width="1200" height="720"></canvas>
+            <p id="perimeterChartNote" class="chart-note"></p>
+            <div class="table-block">
+              <h3>FC3_block perimeter table</h3>
+              <div class="table-scroll">
+                <table id="blockPerimeterTable"></table>
+              </div>
+            </div>
+          </figure>
+          <figure>
+            <figcaption>FC3_block vs max edge length</figcaption>
+            <canvas id="maxEdgeChart" width="1200" height="720"></canvas>
+            <p id="maxEdgeChartNote" class="chart-note"></p>
+            <div class="table-block">
+              <h3>FC3_block max-edge table</h3>
+              <div class="table-scroll">
+                <table id="blockMaxEdgeTable"></table>
+              </div>
+            </div>
+          </figure>
+        </div>
+      </section>
+
+      <section id="compare" class="panel">
+        <section class="compare-panel compare-setup">
+          <div>
+            <h2>FC3 Compare</h2>
+            <p id="compareStatus">No FC3 compare slots are loaded.</p>
+            <p class="compare-help">Compare FC3 files by distribution-level descriptors. This view does not assume matching block counts and does not perform block-by-block parity.</p>
+          </div>
+          <div class="compare-structure">
+            <h3>Structure input</h3>
+            <label>
+              Compare structure
+              <input id="compareStructureInput" type="file" />
+            </label>
+            <button id="loadCompareStructureButton" class="command secondary">Load Structure</button>
+            <p id="compareStructureStatus">No compare structure loaded.</p>
+            <div class="compare-bulk-input">
+              <h3>FC3 input</h3>
+              <label>
+                Batch FORCE_CONSTANTS_3RD
+                <input id="compareBulkFc3Input" type="file" multiple />
+              </label>
+              <button id="loadCompareBulkButton" class="command secondary">Load FC3 Input</button>
+              <p id="compareBulkStatus">No batch FC3 files loaded.</p>
+            </div>
+          </div>
+          <div class="compare-slots">
+            <h3>FC3 compare inputs</h3>
+            <div id="compareSlots"></div>
+          </div>
+        </section>
+        <div id="compareChartGrid" class="chart-grid">
+          <figure>
+            <figcaption id="compareComponentCaption">FC3_component count distribution</figcaption>
+            <canvas id="compareComponentChart" width="1200" height="720"></canvas>
+          </figure>
+          <figure id="compareNegativeFigure" hidden>
+            <figcaption>negative FC3_component count distribution</figcaption>
+            <canvas id="compareNegativeComponentChart" width="1200" height="720"></canvas>
+          </figure>
+          <figure>
+            <figcaption>FC3_block vs perimeter</figcaption>
+            <canvas id="comparePerimeterChart" width="1200" height="720"></canvas>
+          </figure>
+          <figure>
+            <figcaption>FC3_block count distribution</figcaption>
+            <canvas id="compareBlockDistChart" width="1200" height="720"></canvas>
+          </figure>
+          <figure>
+            <figcaption>FC3_block vs max edge length</figcaption>
+            <canvas id="compareMaxEdgeChart" width="1200" height="720"></canvas>
+          </figure>
+        </div>
+      </section>
+    </main>
+
+    <script src="./app.js?v=20260518-intro-polish"></script>
+  </body>
+</html>
+
+

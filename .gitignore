@@ -1,0 +1,22 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+
+# Local prompt history and private working notes
+prompt_Storage/
+
+# Local verification screenshots generated during development
+fc3_*screenshot*.png
+fc3_intro_*.png
+app/fc3_app_*.png
+
