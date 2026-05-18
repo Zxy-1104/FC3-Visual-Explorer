@@ -15,13 +15,34 @@ constant blocks into interactive three-body geometry and compact analysis plots.
 
 ## Online Deployment
 
-This project is designed as a static web app. For Cloudflare Pages, use:
+This project is designed as a static web app.
+
+### GitHub Pages
+
+This repository includes a GitHub Actions workflow that publishes the `app`
+directory to GitHub Pages.
+
+After pushing to GitHub, enable Pages with:
+
+- Repository `Settings`
+- `Pages`
+- Source: `GitHub Actions`
+
+The expected public URL is:
+
+```text
+https://zxy-1104.github.io/FC3-Visual-Explorer/
+```
+
+### Cloudflare Pages
+
+For Cloudflare Pages, connect this GitHub repository and use:
 
 - Build command: leave empty
 - Build output directory: `app`
 
-The app uses relative asset paths, so it can also be served locally from the
-`app` directory.
+The app uses relative asset paths, so the same repository can be deployed by
+GitHub Pages, Cloudflare Pages, or any static file server.
 
 ## Run Locally
 
@@ -54,4 +75,3 @@ static web app.
 FC3 block norms are useful for visual inspection and physical consistency
 checks, but they should not be interpreted as direct predictors of lattice
 thermal conductivity trends.
-
