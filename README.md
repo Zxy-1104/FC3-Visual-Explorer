@@ -2,6 +2,8 @@
 
 FC3 Visual Explorer is a browser-based tool for visualizing, analyzing, and comparing third-order interatomic force constants from ShengBTE/thirdorder workflows.
 
+It converts abstract `FORCE_CONSTANTS_3RD` blocks into interactive three-body geometry and compact analysis plots, helping users examine interaction range, dominant FC3 blocks, tensor-component distributions, and dataset-level differences.
+
 ## Online App
 
 Use the web app here:
@@ -23,21 +25,23 @@ FC3 Visual Explorer includes three main analysis modules:
 
 ## Input Files
 
-To analyze your own data, provide:
+For user-uploaded analysis, provide:
 
-- A ShengBTE/thirdorder-compatible `FORCE_CONSTANTS_3RD` file.
-- A matching Quantum ESPRESSO structure file containing lattice vectors and atomic positions.
+1. A ShengBTE/thirdorder-compatible `FORCE_CONSTANTS_3RD` file.
+2. A matching Quantum ESPRESSO `pw.x` structure file.
 
-The structure file should include information such as:
+The structure file should contain lattice vectors and atomic positions, typically through:
 
 ```text
 CELL_PARAMETERS
 ATOMIC_POSITIONS
 ```
 
+The app currently expects Quantum ESPRESSO-style structure input and FC3 files following the standard thirdorder/ShengBTE FORCE_CONSTANTS_3RD block format.
+
 ## Example Data
 
-The web app includes an embedded default example that loads automatically when the page opens.
+The web app includes an embedded default example that loads automatically when the page opens. Additional example FC3(FC3 input) and structure files(QE structure) are provided in the repository for testing.
 
 You can also upload your own `FORCE_CONSTANTS_3RD` and QE structure files to generate new 3D visualizations, analysis plots, and FC3 comparisons.
 
