@@ -41,7 +41,12 @@ The app currently expects Quantum ESPRESSO-style structure input and FC3 files f
 
 ## Example Data
 
-The web app includes an embedded default example that loads automatically when the page opens. Additional example FC3(FC3 input) and structure files(QE structure) are provided in the repository for testing.
+The web app includes an embedded default example that loads automatically when the page opens. 
+
+Additional test files are provided in the repository:
+
+- FC3 input files: `test/FC3_input/`
+- QE structure files: `test/QE_structure/`
 
 You can also upload your own `FORCE_CONSTANTS_3RD` and QE structure files to generate new 3D visualizations, analysis plots, and FC3 comparisons.
 
