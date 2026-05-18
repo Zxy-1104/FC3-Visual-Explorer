@@ -6,18 +6,6 @@ FC3 Visual Explorer is a lightweight browser-based application for introducing, 
 
 The project turns dense `FORCE_CONSTANTS_3RD` blocks into interactive geometry and compact analysis plots. It is intended to help users inspect FC3 block geometry, tensor-component distributions, block-norm distributions, and differences between multiple FC3 files.
 
-## Application Structure
-
-The public web app is implemented as a static frontend in the `app/` directory:
-
-- `app/index.html`: page layout, navigation tabs, upload controls, chart containers, object panels, and introduction content.
-- `app/styles.css`: visual layout, responsive behavior, panels, cards, controls, tables, and chart styling.
-- `app/app.js`: file parsing, FC3 data construction, 3D rendering, 2D plotting, compare logic, object-tree interaction, and UI state management.
-- `app/data/fc3_045.json`: embedded default example payload loaded when the page opens.
-- `app/assets/`: introduction images and other static visual assets.
-
-The app is deployed as static files. User-uploaded files are read by the browser through file inputs and parsed locally in JavaScript.
-
 ## Default Example
 
 The page opens with an embedded example dataset:
@@ -171,19 +159,3 @@ The Compare page draws:
 4. `FC3_block vs max_edge_length`
 
 All compare plots use global axis ranges across the loaded files so that distributions are visually comparable.
-
-## Static Deployment
-
-The deployed site serves the `app/` directory as static files. No backend service is required for normal use.
-
-The GitHub Pages workflow is stored in:
-
-```text
-.github/workflows/pages.yml
-```
-
-For Cloudflare Pages or another static host, the deployment output directory should be:
-
-```text
-app
-```
