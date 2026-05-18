@@ -1,77 +1,50 @@
+```markdown
 # FC3 Visual Explorer
 
-FC3 Visual Explorer is a browser-based tool for visualizing and analyzing
-ShengBTE/thirdorder `FORCE_CONSTANTS_3RD` files. It converts third-order force
-constant blocks into interactive three-body geometry and compact analysis plots.
+FC3 Visual Explorer is a browser-based tool for visualizing, analyzing, and comparing third-order interatomic force constants from ShengBTE/thirdorder workflows.
 
-## Features
+## Online App
 
-- Interactive 3D FC3 three-body network visualization.
-- Atom, bond, unit-cell, FC3 network, object-tree, highlight, hide, and pick-atom controls.
-- FC3 component and block-norm distributions.
-- FC3 block norm versus triangle perimeter and maximum edge length.
-- Multi-file FC3 comparison for distribution-level analysis.
-- Browser-side parsing for user-uploaded FC3 and Quantum ESPRESSO structure files.
+Use the web app here:
 
-## Online Deployment
-
-This project is designed as a static web app.
-
-### GitHub Pages
-
-This repository includes a GitHub Actions workflow that publishes the `app`
-directory to GitHub Pages.
-
-After pushing to GitHub, enable Pages with:
-
-- Repository `Settings`
-- `Pages`
-- Source: `GitHub Actions`
-
-The expected public URL is:
-
-```text
 https://zxy-1104.github.io/FC3-Visual-Explorer/
-```
 
-### Cloudflare Pages
+## What It Does
 
-For Cloudflare Pages, connect this GitHub repository and use:
+FC3 Visual Explorer includes three main analysis modules:
 
-- Build command: leave empty
-- Build output directory: `app`
+- **3D Visualization**  
+  Displays atoms, bonds, unit-cell boundaries, and FC3 three-body interaction triangles. FC3 block norms are mapped to color and line width, with controls for norm filtering, view direction, lattice boundary selection, atom picking, highlighting, and hiding FC3 objects.
 
-The app uses relative asset paths, so the same repository can be deployed by
-GitHub Pages, Cloudflare Pages, or any static file server.
+- **FC3 Analysis**  
+  Provides plots for FC3 tensor-component distributions, FC3 block-norm distributions, and the relationship between FC3 block strength and three-body geometry, including triangle perimeter and maximum edge length.
 
-## Run Locally
-
-```bash
-cd app
-python -m http.server 8766
-```
-
-Then open:
-
-```text
-http://127.0.0.1:8766
-```
+- **FC3 Compare**  
+  Compares multiple FC3 files using consistent distribution and geometry-based plots, which is useful for checking differences caused by cutoff, supercell size, displacement amplitude, or other calculation settings.
 
 ## Input Files
 
-The default example is embedded in `app/data/fc3_045.json`.
-
-For user uploads, provide:
+To analyze your own data, provide:
 
 - A ShengBTE/thirdorder-compatible `FORCE_CONSTANTS_3RD` file.
-- A matching Quantum ESPRESSO `pw.x` structure file containing lattice vectors
-  and atomic positions.
+- A matching Quantum ESPRESSO structure file containing lattice vectors and atomic positions.
 
-Uploaded files are parsed in the browser. They are not sent to a server by this
-static web app.
+The structure file should include information such as:
 
-## Notes
+```text
+CELL_PARAMETERS
+ATOMIC_POSITIONS
+```
 
-FC3 block norms are useful for visual inspection and physical consistency
-checks, but they should not be interpreted as direct predictors of lattice
-thermal conductivity trends.
+## Example Data
+
+The web app includes an embedded default example that loads automatically when the page opens.
+
+You can also upload your own `FORCE_CONSTANTS_3RD` and QE structure files to generate new 3D visualizations, analysis plots, and FC3 comparisons.
+
+## Contact
+
+For questions or suggestions, please contact:
+
+zhaoxingyu@hnu.edu.cn
+```
