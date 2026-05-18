@@ -50,6 +50,10 @@ Additional test files are provided in the repository:
 
 You can also upload your own `FORCE_CONSTANTS_3RD` and QE structure files to generate new 3D visualizations, analysis plots, and FC3 comparisons.
 
+## Notes
+
+For a more detailed explanation of FC3 definitions, finite-displacement reconstruction, `FORCE_CONSTANTS_3RD` block interpretation, and related physical concepts, please refer to `FC3_derivation_notes.pdf` in this repository.
+
 ## Acknowledgements
 
 FC3 Visual Explorer is designed for visual inspection of third-order force constants in ShengBTE/thirdorder-style workflows. The project is not affiliated with ShengBTE, thirdorder, or Quantum ESPRESSO.
