@@ -1,4 +1,3 @@
-```markdown
 # FC3 Visual Explorer
 
 FC3 Visual Explorer is a browser-based tool for visualizing, analyzing, and comparing third-order interatomic force constants from ShengBTE/thirdorder workflows.
@@ -47,4 +46,3 @@ You can also upload your own `FORCE_CONSTANTS_3RD` and QE structure files to gen
 For questions or suggestions, please contact:
 
 zhaoxingyu@hnu.edu.cn
-```
